@@ -1,0 +1,16 @@
+I had lots of JSON to send and there are tons of 
+XML parsers which can parse using parts of the data
+and do stuff without knowing the entire file, etc.
+
+
+Whatever. I thought it would be easy (and i'm writing
+this readme before I start this project for no reason
+in particular, but i probably won't set up a github
+repo until i'm done, or this file will rot on my hard
+drive for eternity while i'm working on a JS GIF encoder
+based on someone else's AS3 implementation)
+
+
+Based on www.json.org/json_parse.js
+
+
