@@ -1,4 +1,6 @@
-
+/*
+json_parse(read, out)
+*/
 var json_parse = (function () {
     var at,     // The index of the current character
         ch,     // The current character
