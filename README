@@ -11,63 +11,57 @@ drive for eternity while i'm working on a JS GIF encoder
 based on someone else's AS3 implementation)
 
 
-Based on http://code.google.com/p/json-sans-eval/
+Based on www.json.org/json_parse.js
 
+/*
+    http://www.JSON.org/json_parse.js
+    2009-05-31
 
-// This source code is free for use in the public domain.
-// NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+    Public Domain.
 
-// http://code.google.com/p/json-sans-eval/
+    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
 
-/**
- * Parses a string of well-formed JSON text.
- *
- * If the input is not well-formed, then behavior is undefined, but it is
- * deterministic and is guaranteed not to modify any object other than its
- * return value.
- *
- * This does not use `eval` so is less likely to have obscure security bugs than
- * json2.js.
- * It is optimized for speed, so is much faster than json_parse.js.
- *
- * This library should be used whenever security is a concern (when JSON may
- * come from an untrusted source), speed is a concern, and erroring on malformed
- * JSON is *not* a concern.
- *
- *                      Pros                   Cons
- *                    +-----------------------+-----------------------+
- * json_sans_eval.js  | Fast, secure          | Not validating        |
- *                    +-----------------------+-----------------------+
- * json_parse.js      | Validating, secure    | Slow                  |
- *                    +-----------------------+-----------------------+
- * json2.js           | Fast, some validation | Potentially insecure  |
- *                    +-----------------------+-----------------------+
- *
- * json2.js is very fast, but potentially insecure since it calls `eval` to
- * parse JSON data, so an attacker might be able to supply strange JS that
- * looks like JSON, but that executes arbitrary javascript.
- * If you do have to use json2.js with untrusted data, make sure you keep
- * your version of json2.js up to date so that you get patches as they're
- * released.
- *
- * @param {string} json per RFC 4627
- * @param {function (this:Object, string, *):*} opt_reviver optional function
- *     that reworks JSON objects post-parse per Chapter 15.12 of EcmaScript3.1.
- *     If supplied, the function is called with a string key, and a value.
- *     The value is the property of 'this'.  The reviver should return
- *     the value to use in its place.  So if dates were serialized as
- *     {@code { "type": "Date", "time": 1234 }}, then a reviver might look like
- *     {@code
- *     function (key, value) {
- *       if (value && typeof value === 'object' && 'Date' === value.type) {
- *         return new Date(value.time);
- *       } else {
- *         return value;
- *       }
- *     }}.
- *     If the reviver returns {@code undefined} then the property named by key
- *     will be deleted from its container.
- *     {@code this} is bound to the object containing the specified property.
- * @return {Object|Array}
- * @author Mike Samuel <mikesamuel@gmail.com>
- */
+    This file creates a json_parse function.
+
+        json_parse(text, reviver)
+            This method parses a JSON text to produce an object or array.
+            It can throw a SyntaxError exception.
+
+            The optional reviver parameter is a function that can filter and
+            transform the results. It receives each of the keys and values,
+            and its return value is used instead of the original value.
+            If it returns what it received, then the structure is not modified.
+            If it returns undefined then the member is deleted.
+
+            Example:
+
+            // Parse the text. Values that look like ISO date strings will
+            // be converted to Date objects.
+
+            myData = json_parse(text, function (key, value) {
+                var a;
+                if (typeof value === 'string') {
+                    a =
+/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+                    if (a) {
+                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
+                            +a[5], +a[6]));
+                    }
+                }
+                return value;
+            });
+
+    This is a reference implementation. You are free to copy, modify, or
+    redistribute.
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+*/
+
+/*members "", "\"", "\/", "\\", at, b, call, charAt, f, fromCharCode,
+    hasOwnProperty, message, n, name, push, r, t, text
+*/
+
