@@ -1,4 +1,3 @@
-alert('IMPORTANT: Remove this line from json_parse.js before deployment.');
 /*
     http://www.JSON.org/json_parse.js
     2009-05-31
@@ -320,27 +319,7 @@ var json_parse = (function () {
             error("Syntax error");
         }
 
-// If there is a reviver function, we recursively walk the new structure,
-// passing each name/value pair to the reviver function for possible
-// transformation, starting with a temporary root object that holds the result
-// in an empty key. If there is not a reviver function, we simply return the
-// result.
 
-        return typeof reviver === 'function' ? (function walk(holder, key) {
-            var k, v, value = holder[key];
-            if (value && typeof value === 'object') {
-                for (k in value) {
-                    if (Object.hasOwnProperty.call(value, k)) {
-                        v = walk(value, k);
-                        if (v !== undefined) {
-                            value[k] = v;
-                        } else {
-                            delete value[k];
-                        }
-                    }
-                }
-            }
-            return reviver.call(holder, key, value);
-        }({'': result}, '')) : result;
+        return  result;
     };
 }());
