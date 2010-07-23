@@ -1,60 +1,3 @@
-// This source code is free for use in the public domain.
-// NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-// http://code.google.com/p/json-sans-eval/
-
-/**
- * Parses a string of well-formed JSON text.
- *
- * If the input is not well-formed, then behavior is undefined, but it is
- * deterministic and is guaranteed not to modify any object other than its
- * return value.
- *
- * This does not use `eval` so is less likely to have obscure security bugs than
- * json2.js.
- * It is optimized for speed, so is much faster than json_parse.js.
- *
- * This library should be used whenever security is a concern (when JSON may
- * come from an untrusted source), speed is a concern, and erroring on malformed
- * JSON is *not* a concern.
- *
- *                      Pros                   Cons
- *                    +-----------------------+-----------------------+
- * json_sans_eval.js  | Fast, secure          | Not validating        |
- *                    +-----------------------+-----------------------+
- * json_parse.js      | Validating, secure    | Slow                  |
- *                    +-----------------------+-----------------------+
- * json2.js           | Fast, some validation | Potentially insecure  |
- *                    +-----------------------+-----------------------+
- *
- * json2.js is very fast, but potentially insecure since it calls `eval` to
- * parse JSON data, so an attacker might be able to supply strange JS that
- * looks like JSON, but that executes arbitrary javascript.
- * If you do have to use json2.js with untrusted data, make sure you keep
- * your version of json2.js up to date so that you get patches as they're
- * released.
- *
- * @param {string} json per RFC 4627
- * @param {function (this:Object, string, *):*} opt_reviver optional function
- *     that reworks JSON objects post-parse per Chapter 15.12 of EcmaScript3.1.
- *     If supplied, the function is called with a string key, and a value.
- *     The value is the property of 'this'.  The reviver should return
- *     the value to use in its place.  So if dates were serialized as
- *     {@code { "type": "Date", "time": 1234 }}, then a reviver might look like
- *     {@code
- *     function (key, value) {
- *       if (value && typeof value === 'object' && 'Date' === value.type) {
- *         return new Date(value.time);
- *       } else {
- *         return value;
- *       }
- *     }}.
- *     If the reviver returns {@code undefined} then the property named by key
- *     will be deleted from its container.
- *     {@code this} is bound to the object containing the specified property.
- * @return {Object|Array}
- * @author Mike Samuel <mikesamuel@gmail.com>
- */
 var jsonParse = (function () {
   var number
       = '(?:-?\\b(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b)';
@@ -100,7 +43,7 @@ var jsonParse = (function () {
 
   var hop = Object.hasOwnProperty;
 
-  return function (json, opt_reviver) {
+  return function (json) {
     // Split into tokens
     var toks = json.match(jsonToken);
     // Construct the object to return
@@ -193,45 +136,6 @@ var jsonParse = (function () {
       if (stack.length) { throw new Error(); }
     }
 
-    if (opt_reviver) {
-      // Based on walk as implemented in http://www.json.org/json2.js
-      var walk = function (holder, key) {
-        var value = holder[key];
-        if (value && typeof value === 'object') {
-          var toDelete = null;
-          for (var k in value) {
-            if (hop.call(value, k) && value !== holder) {
-              // Recurse to properties first.  This has the effect of causing
-              // the reviver to be called on the object graph depth-first.
-
-              // Since 'this' is bound to the holder of the property, the
-              // reviver can access sibling properties of k including ones
-              // that have not yet been revived.
-
-              // The value returned by the reviver is used in place of the
-              // current value of property k.
-              // If it returns undefined then the property is deleted.
-              var v = walk(value, k);
-              if (v !== void 0) {
-                value[k] = v;
-              } else {
-                // Deleting properties inside the loop has vaguely defined
-                // semantics in ES3 and ES3.1.
-                if (!toDelete) { toDelete = []; }
-                toDelete.push(k);
-              }
-            }
-          }
-          if (toDelete) {
-            for (var i = toDelete.length; --i >= 0;) {
-              delete value[toDelete[i]];
-            }
-          }
-        }
-        return opt_reviver.call(holder, key, value);
-      };
-      result = walk({ '': result }, '');
-    }
 
     return result;
   };
